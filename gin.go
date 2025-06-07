@@ -38,13 +38,13 @@ func SlogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
-		// Capture request details
+		// capture request details
 		method := c.Request.Method
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
 		clientIP := c.ClientIP()
 
-		// Clone and read the request body (if needed for logging)
+		// clone and read the request body (if needed for logging)
 		var requestBody string
 		if c.Request.Body != nil {
 			bodyBytes, _ := io.ReadAll(c.Request.Body)
@@ -52,7 +52,7 @@ func SlogMiddleware() gin.HandlerFunc {
 			c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes)) // Restore the body
 		}
 
-		// Set up response recording
+		// set up response recording
 		recorder := &ResponseRecorder{
 			ResponseWriter: c.Writer,
 			body:           bytes.NewBuffer([]byte{}),
@@ -60,13 +60,13 @@ func SlogMiddleware() gin.HandlerFunc {
 		}
 		c.Writer = recorder
 
-		// Process the request
+		// process the request
 		c.Next()
 
-		// Calculate response time
+		// calculate response time
 		latency := time.Since(start)
 
-		// Log request and response details
+		// log request and response details
 		Ctx(c).Info("api",
 			"method", method,
 			"path", path,
