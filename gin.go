@@ -89,7 +89,17 @@ const (
 )
 
 func Ctx(reqCtx context.Context) *slog.Logger {
-	return log.Logger.With(KeyLoggerRequestID, reqCtx.Value(KeyGinRequestID), KeyLoggerUserAgent, reqCtx.Value(KeyGinUserAgent))
+	params := []any{}
+	if reqCtx == nil {
+		return log.Logger
+	}
+	if reqCtx.Value(KeyGinRequestID) != nil {
+		params = append(params, KeyLoggerRequestID, reqCtx.Value(KeyGinRequestID))
+	}
+	if reqCtx.Value(KeyGinUserAgent) != nil {
+		params = append(params, KeyLoggerUserAgent, reqCtx.Value(KeyGinUserAgent))
+	}
+	return log.Logger.With(params...)
 }
 
 func GinLogTraceMiddleware() gin.HandlerFunc {
